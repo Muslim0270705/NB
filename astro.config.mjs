@@ -1,16 +1,22 @@
 // @ts-check
 
+import netlify from '@astrojs/netlify';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, envField } from 'astro/config';
 
 // https://astro.build/config
+// На Netlify (NETLIFY=true при сборке) — серверлесс-функции и Netlify Blobs,
+// везде остальном — Node-сервер и файлы на диске (Docker, локальная разработка)
+const onNetlify = process.env.NETLIFY === 'true';
+
 export default defineConfig({
-	site: 'https://nsbarber.kg',
+	// Адрес сайта для canonical/OG: SITE_URL, иначе основной адрес Netlify, иначе будущий домен
+	site: process.env.SITE_URL || (onNetlify && process.env.URL) || 'https://nsbarber.kg',
 	// Главная и админка рендерятся на сервере (контент редактируется из админки),
 	// служебные страницы (404) собираются статически
-	adapter: node({ mode: 'standalone' }),
+	adapter: onNetlify ? netlify() : node({ mode: 'standalone' }),
 	server: { port: 3000 },
 	env: {
 		schema: {
@@ -30,6 +36,9 @@ export default defineConfig({
 	},
 	vite: {
 		plugins: [tailwindcss()],
+		define: {
+			__NS_STORAGE__: JSON.stringify(onNetlify ? 'blobs' : 'fs'),
+		},
 	},
 	integrations: [react()],
 });

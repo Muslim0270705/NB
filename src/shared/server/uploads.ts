@@ -1,10 +1,8 @@
-import { readdir, unlink, writeFile } from 'node:fs/promises';
-import path from 'node:path';
-import sharp from 'sharp';
-import { ensureDirs, newId, uploadsDir } from './store';
+import { kv, newId } from './store';
 
 export const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 export const UPLOAD_NAME = /^[a-z0-9-]+\.webp$/;
+const PREFIX = 'uploads/';
 
 export interface UploadedImage {
 	src: string;
@@ -18,8 +16,9 @@ export interface UploadedImage {
 export async function saveImage(file: File): Promise<UploadedImage> {
 	if (file.size > MAX_UPLOAD_BYTES) throw new Error('too_large');
 	if (!file.type.startsWith('image/')) throw new Error('not_image');
-	await ensureDirs();
 
+	// sharp грузится только здесь: сбой нативного модуля не должен ронять весь сайт
+	const { default: sharp } = await import('sharp');
 	const input = Buffer.from(await file.arrayBuffer());
 	const id = newId('img-');
 	const image = sharp(input, { failOn: 'error' }).rotate();
@@ -35,8 +34,9 @@ export async function saveImage(file: File): Promise<UploadedImage> {
 		.webp({ quality: 74 })
 		.toBuffer();
 
-	await writeFile(path.join(uploadsDir, `${id}.webp`), large.data);
-	await writeFile(path.join(uploadsDir, `${id}-sm.webp`), small);
+	const store = await kv();
+	await store.set(`${PREFIX}${id}.webp`, new Uint8Array(large.data));
+	await store.set(`${PREFIX}${id}-sm.webp`, new Uint8Array(small));
 
 	return {
 		src: `/uploads/${id}.webp`,
@@ -46,17 +46,21 @@ export async function saveImage(file: File): Promise<UploadedImage> {
 	};
 }
 
-// Удаляем с диска файлы, на которые больше не ссылается контент
+export async function readImage(name: string): Promise<Uint8Array | null> {
+	if (!UPLOAD_NAME.test(name)) return null;
+	return (await kv()).getBytes(`${PREFIX}${name}`);
+}
+
+// Удаляем файлы, на которые больше не ссылается контент
 export async function removeUnreferenced(referenced: Set<string>): Promise<void> {
-	let files: string[] = [];
-	try {
-		files = await readdir(uploadsDir);
-	} catch {
-		return;
-	}
+	const store = await kv();
+	const keys = await store.list(PREFIX);
 	await Promise.all(
-		files
-			.filter((name) => UPLOAD_NAME.test(name) && !referenced.has(`/uploads/${name}`))
-			.map((name) => unlink(path.join(uploadsDir, name)).catch(() => undefined))
+		keys
+			.filter((key) => {
+				const name = key.slice(PREFIX.length);
+				return UPLOAD_NAME.test(name) && !referenced.has(`/uploads/${name}`);
+			})
+			.map((key) => store.delete(key).catch(() => undefined))
 	);
 }

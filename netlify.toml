@@ -1,0 +1,8 @@
+# Netlify сам распознаёт Astro; здесь фиксируем команду и версию Node.
+# Папку публикации задаёт адаптер @astrojs/netlify (dist), функции — в .netlify/
+[build]
+  command = "pnpm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
