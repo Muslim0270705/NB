@@ -1,0 +1,27 @@
+---
+import Layout from '@/app/layouts/Layout.astro';
+import { getContent } from '@/entities/content/api/content.repo';
+import About from '@/widgets/about/ui/About.astro';
+import BookingSection from '@/widgets/booking/ui/BookingSection.astro';
+import Contacts from '@/widgets/contacts/ui/Contacts.astro';
+import Gallery from '@/widgets/gallery/ui/Gallery.astro';
+import Hero from '@/widgets/hero/ui/Hero.astro';
+import PriceList from '@/widgets/price-list/ui/PriceList.astro';
+import Reviews from '@/widgets/reviews/ui/Reviews.astro';
+
+// Рендер на сервере: цены, фото и контакты подтягиваются из админки без пересборки
+export const prerender = false;
+
+const content = await getContent();
+Astro.response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=600');
+---
+
+<Layout content={content}>
+	<Hero content={content} />
+	<PriceList content={content} />
+	<About content={content} />
+	<Gallery content={content} />
+	<Reviews content={content} />
+	<BookingSection content={content} />
+	<Contacts content={content} />
+</Layout>

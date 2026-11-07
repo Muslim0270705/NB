@@ -1,0 +1,84 @@
+---
+import { Star } from 'lucide-react';
+import type { SiteContent } from '@/entities/content';
+import { pluralize } from '@/shared/lib/format';
+import { twoGisReviewsLink } from '@/shared/lib/links';
+import { buttonClass } from '@/shared/ui/button-styles';
+import SectionHeading from '@/shared/ui/section-heading.astro';
+
+interface Props {
+	content: SiteContent;
+}
+
+const { reviews, rating, contacts } = Astro.props.content;
+const reviewsUrl = twoGisReviewsLink(contacts.twoGisUrl);
+---
+
+<section id='reviews' aria-labelledby='reviews-title' class='bg-sand py-20 lg:py-32'>
+	<div class='section-container'>
+		<div class='grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20'>
+			<div class='flex flex-col gap-10'>
+				<SectionHeading id='reviews-title' eyebrow='Отзывы' title='Нам доверяют' />
+				{
+					rating.count > 0 && (
+						<div class='flex items-center gap-6 animate-on-scroll opacity-0 translate-y-6 transition-all duration-700 ease-out-soft'>
+							<span class='text-[clamp(4.5rem,9vw,7rem)] font-black leading-none tracking-[-0.04em]'>
+								{rating.value.toFixed(1)}
+							</span>
+							<div class='flex flex-col gap-2'>
+								<span class='flex gap-1' aria-label={`Рейтинг ${rating.value} из 5`}>
+									{Array.from({ length: 5 }, () => (
+										<Star size={18} fill='currentColor' />
+									))}
+								</span>
+								<span class='text-body-lg text-ink/70'>
+									{rating.count} {pluralize(rating.count, ['оценка', 'оценки', 'оценок'])} в 2ГИС
+								</span>
+							</div>
+						</div>
+					)
+				}
+				<div class='flex flex-wrap gap-3'>
+					<a href={reviewsUrl} target='_blank' rel='noopener noreferrer' class={buttonClass('primary', 'md')}>
+						Все отзывы в 2ГИС
+					</a>
+					<a href={reviewsUrl} target='_blank' rel='noopener noreferrer' class={buttonClass('outline', 'md')}>
+						Оставить отзыв
+					</a>
+				</div>
+			</div>
+
+			{
+				reviews.length > 0 ? (
+					<ul class='grid gap-px bg-ink/10 sm:grid-cols-2'>
+						{reviews.slice(0, 6).map((r, i) => (
+							<li
+								class:list={[
+									'flex flex-col gap-5 bg-sand p-6 sm:p-8',
+									'animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out-soft',
+									i % 2 === 1 && 'delay-150',
+								]}
+							>
+								<span class='flex gap-0.5' aria-label={`Оценка ${r.rating} из 5`}>
+									{Array.from({ length: r.rating }, () => (
+										<Star size={14} fill='currentColor' />
+									))}
+								</span>
+								<blockquote class='flex-1 text-body-lg text-ink/85'>«{r.text}»</blockquote>
+								<p class='text-caption font-bold uppercase tracking-[0.2em]'>{r.author}</p>
+							</li>
+						))}
+					</ul>
+				) : (
+					<div class='flex flex-col justify-center gap-4 border border-ink/15 p-8 lg:p-12 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out-soft'>
+						<p class='text-h3 font-extrabold uppercase'>Были у нас?</p>
+						<p class='text-body-lg text-ink/70'>
+							Расскажите о визите в 2ГИС — это помогает нам становиться лучше, а другим гостям
+							выбрать своего мастера.
+						</p>
+					</div>
+				)
+			}
+		</div>
+	</div>
+</section>

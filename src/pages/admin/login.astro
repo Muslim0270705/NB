@@ -1,0 +1,49 @@
+---
+import AdminLayout from '@/app/layouts/AdminLayout.astro';
+import { isAdminEnabled, isAuthed } from '@/shared/server/auth';
+import { buttonClass } from '@/shared/ui/button-styles';
+import { Logo } from '@/shared/ui/logo';
+
+export const prerender = false;
+
+if (isAuthed(Astro.cookies)) return Astro.redirect('/admin');
+
+const error = Astro.url.searchParams.get('error');
+const enabled = isAdminEnabled();
+---
+
+<AdminLayout title='Вход'>
+	<main class='flex min-h-screen items-center justify-center p-4'>
+		<form
+			method='post'
+			action='/api/admin/login'
+			class='flex w-full max-w-sm flex-col gap-6 bg-paper p-8 shadow-[0_30px_80px_-40px_rgb(26_26_26/0.4)]'
+		>
+			<Logo className='h-24 self-center' />
+			<h1 class='text-center text-caption font-semibold uppercase tracking-[0.3em] text-stone'>
+				Панель управления
+			</h1>
+			{
+				!enabled && (
+					<p class='bg-cream p-3 text-body-md text-danger'>
+						Админка выключена: задайте переменную окружения ADMIN_PASSWORD и перезапустите сервер.
+					</p>
+				)
+			}
+			<label class='flex flex-col gap-2'>
+				<span class='text-caption font-semibold uppercase tracking-[0.18em] text-stone'>Пароль</span>
+				<input
+					type='password'
+					name='password'
+					required
+					autocomplete='current-password'
+					class='h-12 border border-ink/20 px-4 outline-none focus:border-ink'
+				/>
+			</label>
+			{error === '1' && <p class='text-body-md text-danger'>Неверный пароль</p>}
+			{error === 'limit' && <p class='text-body-md text-danger'>Слишком много попыток. Подождите 15 минут.</p>}
+			<button type='submit' class={buttonClass('primary', 'lg')} disabled={!enabled}>Войти</button>
+			<a href='/' class='text-center text-body-md text-stone hover:text-ink'>← На сайт</a>
+		</form>
+	</main>
+</AdminLayout>

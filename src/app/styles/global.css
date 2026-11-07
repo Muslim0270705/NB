@@ -1,0 +1,118 @@
+@import "tailwindcss";
+@import "@fontsource-variable/montserrat";
+
+@theme inline {
+	/* ─── Шрифт: гротеск в стиле логотипа ─────────────── */
+	--font-sans: "Montserrat Variable", "Helvetica Neue", Arial, sans-serif;
+
+	/* ─── Палитра бренда (только бежево-чёрная гамма логотипа) ─── */
+	--color-cream: #efe9e1; /* основной фон */
+	--color-sand: #c9bba8; /* глубокий бежевый, акценты фона */
+	--color-sand-soft: #ddd3c6; /* промежуточный оттенок для линий/плашек */
+	--color-ink: #1a1a1a; /* текст и акценты */
+	--color-stone: #555555; /* второстепенный текст */
+	--color-paper: #ffffff; /* карточки */
+	--color-danger: #8a2b20; /* только для ошибок форм */
+
+	/* ─── Семантика ─────────────────────────────────── */
+	--color-background: var(--color-cream);
+	--color-foreground: var(--color-ink);
+	--color-muted-foreground: var(--color-stone);
+	--color-border: color-mix(in oklab, var(--color-ink) 14%, transparent);
+
+	/* ─── Шрифтовая шкала ───────────────────────────── */
+	--text-display: clamp(4.5rem, 11vw, 9rem);
+	--text-display--line-height: 0.92;
+	--text-h1: clamp(2.25rem, 5vw, 4.5rem);
+	--text-h1--line-height: 1;
+	--text-h2: clamp(2rem, 4vw, 3.5rem);
+	--text-h2--line-height: 1.05;
+	--text-h3: clamp(1.375rem, 2vw, 1.75rem);
+	--text-h3--line-height: 1.2;
+	--text-body-xl: 1.125rem;
+	--text-body-xl--line-height: 1.7;
+	--text-body-lg: 1rem;
+	--text-body-lg--line-height: 1.6;
+	--text-body-md: 0.875rem;
+	--text-body-md--line-height: 1.5;
+	--text-caption: 0.75rem;
+	--text-caption--line-height: 1rem;
+
+	/* ─── Анимации ──────────────────────────────────── */
+	--ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+	html {
+		@apply font-sans scroll-smooth antialiased;
+		scroll-padding-top: 5rem;
+	}
+	body {
+		@apply bg-background text-foreground;
+		font-feature-settings: "tnum" 0;
+	}
+	::selection {
+		@apply bg-ink text-cream;
+	}
+	:focus-visible {
+		@apply outline-2 outline-offset-2 outline-ink;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+		*,
+		*::before,
+		*::after {
+			transition-duration: 0.01ms !important;
+			animation-duration: 0.01ms !important;
+		}
+	}
+}
+
+@layer utilities {
+	/* Общий контейнер секций */
+	.section-container {
+		@apply mx-auto w-full max-w-[1320px] px-4 md:px-8 lg:px-12;
+	}
+	/* Разрядка как в логотипе BARBER / STUDIO */
+	.tracking-logo {
+		letter-spacing: 0.42em;
+	}
+	/* Подпись-надзаголовок секции */
+	.eyebrow {
+		@apply text-caption font-semibold uppercase text-stone;
+		letter-spacing: 0.3em;
+	}
+	/* Пунктир между названием услуги и ценой */
+	.leader {
+		@apply mx-3 mb-[0.35em] min-w-6 flex-1 border-b border-dotted border-ink/30;
+	}
+	/* Заглушка фото, пока заказчик не загрузил снимки через админку */
+	.photo-placeholder {
+		background:
+			repeating-linear-gradient(135deg, transparent 0 14px, rgb(26 26 26 / 0.04) 14px 15px),
+			linear-gradient(160deg, var(--color-sand-soft), var(--color-sand));
+	}
+	.photo-placeholder-dark {
+		background:
+			repeating-linear-gradient(135deg, transparent 0 14px, rgb(255 255 255 / 0.035) 14px 15px),
+			linear-gradient(160deg, #2a2826, var(--color-ink));
+	}
+	/* Появление первого экрана — чистый CSS, без ожидания JS (важно для PageSpeed) */
+	.hero-in {
+		animation: hero-in 0.9s var(--ease-out-soft) both;
+	}
+	/* NOTE: opacity-0 ставится Tailwind-классом рядом с animate-on-scroll —
+	   наблюдатель в Layout.astro снимает именно класс. */
+}
+
+@keyframes hero-in {
+	from {
+		opacity: 0;
+		transform: translateY(18px);
+	}
+}

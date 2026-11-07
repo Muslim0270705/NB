@@ -1,0 +1,49 @@
+---
+import { Phone } from 'lucide-react';
+import type { Contacts } from '@/entities/content';
+import { BOOKING_ANCHOR } from '@/shared/config/site';
+import { telLink, whatsappLink } from '@/shared/lib/links';
+import { WhatsappIcon } from '@/shared/ui/icons';
+
+interface Props {
+	contacts: Contacts;
+}
+
+const { contacts } = Astro.props;
+---
+
+<!-- Фиксированная панель записи на телефонах: кнопка «Записаться» всегда под рукой -->
+<div
+	class='fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/10 bg-cream/95 p-3 backdrop-blur md:hidden'
+>
+	<a
+		href={BOOKING_ANCHOR}
+		class='flex h-12 flex-1 items-center justify-center bg-ink text-caption font-semibold uppercase tracking-[0.2em] text-cream'
+	>
+		Записаться
+	</a>
+	{
+		contacts.phone && (
+			<a
+				href={telLink(contacts.phone)}
+				aria-label='Позвонить'
+				class='flex size-12 items-center justify-center border border-ink/25 text-ink'
+			>
+				<Phone size={20} />
+			</a>
+		)
+	}
+	{
+		contacts.whatsapp && (
+			<a
+				href={whatsappLink(contacts.whatsapp, 'Здравствуйте! Хочу записаться в NS Barber Studio.')}
+				target='_blank'
+				rel='noopener noreferrer'
+				aria-label='Написать в WhatsApp'
+				class='flex size-12 items-center justify-center border border-ink/25 text-ink'
+			>
+				<WhatsappIcon size={20} />
+			</a>
+		)
+	}
+</div>

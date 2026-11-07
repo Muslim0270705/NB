@@ -1,0 +1,166 @@
+---
+import '@/app/styles/global.css';
+import { PUBLIC_GA_ID, PUBLIC_YM_ID } from 'astro:env/client';
+import type { SiteContent } from '@/entities/content';
+import { defaultContent } from '@/entities/content';
+import { SITE } from '@/shared/config/site';
+import { instagramLink } from '@/shared/lib/links';
+import { displayPhone } from '@/shared/lib/phone';
+import Footer from '@/widgets/footer/ui/Footer.astro';
+import Header from '@/widgets/header/ui/Header';
+import MobileCta from '@/widgets/mobile-cta/ui/MobileCta.astro';
+
+interface Props {
+	title?: string;
+	description?: string;
+	content?: SiteContent;
+	noindex?: boolean;
+}
+
+const {
+	title,
+	description = SITE.description,
+	content = defaultContent(),
+	noindex = false,
+} = Astro.props;
+const { contacts, rating } = content;
+
+const pageTitle = title
+	? `${title} — ${SITE.name}`
+	: `${SITE.name} — барбершоп в Бишкеке | Стрижки и борода, онлайн-запись`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL('/cover.png', Astro.site);
+
+// Разметка LocalBusiness для Google/Яндекс: адрес, часы, телефон, рейтинг
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'BarberShop',
+	name: SITE.name,
+	description: SITE.description,
+	url: Astro.site?.href,
+	image: ogImageURL.href,
+	telephone: contacts.phone ? `+${contacts.phone}` : undefined,
+	priceRange: '200–3000 KGS',
+	address: {
+		'@type': 'PostalAddress',
+		streetAddress: contacts.address,
+		addressLocality: 'Бишкек',
+		addressCountry: 'KG',
+	},
+	geo: { '@type': 'GeoCoordinates', latitude: contacts.lat, longitude: contacts.lon },
+	openingHoursSpecification: {
+		'@type': 'OpeningHoursSpecification',
+		dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+		opens: contacts.openFrom,
+		closes: contacts.openTo,
+	},
+	sameAs: [instagramLink(contacts.instagram), contacts.twoGisUrl],
+	...(rating.count
+		? {
+				aggregateRating: {
+					'@type': 'AggregateRating',
+					ratingValue: rating.value,
+					reviewCount: rating.count,
+				},
+			}
+		: {}),
+};
+---
+
+<!doctype html>
+<html lang='ru'>
+	<head>
+		<meta charset='utf-8' />
+		<meta name='viewport' content='width=device-width, initial-scale=1' />
+		<meta name='theme-color' content='#EFE9E1' />
+
+		<link rel='icon' type='image/svg+xml' href='/favicon.svg' />
+		<link rel='icon' type='image/png' sizes='96x96' href='/favicon-96x96.png' />
+		<link rel='apple-touch-icon' sizes='180x180' href='/apple-touch-icon.png' />
+		<link rel='manifest' href='/site.webmanifest' />
+		<meta name='generator' content={Astro.generator} />
+
+		<title>{pageTitle}</title>
+		<meta name='description' content={description} />
+		<link rel='canonical' href={canonicalURL} />
+		{noindex && <meta name='robots' content='noindex, nofollow' />}
+
+		<meta property='og:type' content='website' />
+		<meta property='og:url' content={canonicalURL} />
+		<meta property='og:title' content={pageTitle} />
+		<meta property='og:description' content={description} />
+		<meta property='og:image' content={ogImageURL} />
+		<meta property='og:locale' content={SITE.locale} />
+		<meta property='og:site_name' content={SITE.name} />
+		<meta name='twitter:card' content='summary_large_image' />
+
+		{!noindex && <script type='application/ld+json' set:html={JSON.stringify(jsonLd)} />}
+
+		{
+			PUBLIC_GA_ID && !noindex && (
+				<>
+					<script async src={`https://www.googletagmanager.com/gtag/js?id=${PUBLIC_GA_ID}`} />
+					<script is:inline define:vars={{ gaId: PUBLIC_GA_ID }}>
+						window.dataLayer = window.dataLayer || [];
+						function gtag(){dataLayer.push(arguments);}
+						gtag('js', new Date());
+						gtag('config', gaId);
+						window.addEventListener('ns:lead', (e) => gtag('event', 'generate_lead', { form: e.detail }));
+					</script>
+				</>
+			)
+		}
+		{
+			PUBLIC_YM_ID && !noindex && (
+				<script is:inline define:vars={{ ymId: Number(PUBLIC_YM_ID) }}>
+					(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+					m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+					(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+					ym(ymId, 'init', { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
+					window.addEventListener('ns:lead', (e) => ym(ymId, 'reachGoal', 'lead_' + e.detail));
+				</script>
+			)
+		}
+	</head>
+	<body class='pb-[72px] md:pb-0'>
+		<a
+			href='#main'
+			class='sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-ink focus:px-4 focus:py-2 focus:text-cream'
+		>
+			Перейти к содержимому
+		</a>
+		<Header
+			client:load
+			phone={contacts.phone}
+			phoneLabel={displayPhone(contacts.phone)}
+			instagram={contacts.instagram}
+			twoGisUrl={contacts.twoGisUrl}
+			whatsapp={contacts.whatsapp}
+		/>
+		<main id='main'>
+			<slot />
+		</main>
+		<Footer content={content} />
+		<MobileCta contacts={contacts} />
+	</body>
+	<script>
+		// Спокойная анимация появления блоков при прокрутке (как в Nomad College)
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (!entry.isIntersecting) continue;
+					const el = entry.target as HTMLElement;
+					el.classList.remove('opacity-0');
+					el.classList.add('opacity-100');
+					for (const cls of [...el.classList]) {
+						if (/^-?translate-[xy]-/.test(cls)) el.classList.remove(cls);
+					}
+					el.classList.add('translate-y-0', 'translate-x-0');
+					observer.unobserve(el);
+				}
+			},
+			{ threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+		);
+		for (const el of document.querySelectorAll('.animate-on-scroll')) observer.observe(el);
+	</script>
+</html>

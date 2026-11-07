@@ -1,0 +1,118 @@
+---
+import type { SiteContent } from '@/entities/content';
+import BookingForm from '@/features/booking-form/ui/BookingForm';
+import { SITE } from '@/shared/config/site';
+import { instagramLink, telLink, twoGisWidgetUrl, whatsappLink } from '@/shared/lib/links';
+import { displayPhone } from '@/shared/lib/phone';
+import { buttonClass } from '@/shared/ui/button-styles';
+import { InstagramIcon, TwoGisIcon, WhatsappIcon } from '@/shared/ui/icons';
+import SectionHeading from '@/shared/ui/section-heading.astro';
+
+interface Props {
+	content: SiteContent;
+}
+
+const { contacts } = Astro.props.content;
+const mapUrl = twoGisWidgetUrl(contacts.twoGisUrl, contacts.lat, contacts.lon);
+const routeUrl = `https://2gis.kg/bishkek/directions/points/%7C${contacts.lon}%2C${contacts.lat}`;
+---
+
+<section id='contacts' aria-labelledby='contacts-title' class='py-20 lg:py-32'>
+	<div class='section-container'>
+		<SectionHeading id='contacts-title' eyebrow='Контакты' title='Как нас найти' />
+
+		<div class='mt-14 grid gap-px bg-ink/10 lg:grid-cols-[0.9fr_1.1fr]'>
+			<div class='flex flex-col gap-10 bg-cream py-2 lg:pr-12'>
+				<dl class='grid gap-8 sm:grid-cols-2'>
+					<div class='flex flex-col gap-2'>
+						<dt class='eyebrow'>Адрес</dt>
+						<dd class='text-body-xl font-semibold'>
+							{SITE.city}, {contacts.address}
+							{contacts.addressNote && <span class='block text-body-md font-normal text-stone'>{contacts.addressNote}</span>}
+						</dd>
+					</div>
+					<div class='flex flex-col gap-2'>
+						<dt class='eyebrow'>Часы работы</dt>
+						<dd class='text-body-xl font-semibold'>
+							{contacts.hoursDays}
+							<span class='block'>{contacts.openFrom} – {contacts.openTo}</span>
+						</dd>
+					</div>
+					{
+						contacts.phone && (
+							<div class='flex flex-col gap-2'>
+								<dt class='eyebrow'>Телефон</dt>
+								<dd>
+									<a href={telLink(contacts.phone)} class='text-body-xl font-semibold hover:underline'>
+										{displayPhone(contacts.phone)}
+									</a>
+								</dd>
+							</div>
+						)
+					}
+					<div class='flex flex-col gap-2'>
+						<dt class='eyebrow'>Мессенджеры</dt>
+						<dd class='flex flex-wrap gap-2'>
+							{
+								contacts.whatsapp && (
+									<a
+										href={whatsappLink(contacts.whatsapp)}
+										target='_blank'
+										rel='noopener noreferrer'
+										aria-label='WhatsApp'
+										class='flex size-11 items-center justify-center border border-ink/20 hover:bg-ink hover:text-cream'
+									>
+										<WhatsappIcon size={19} />
+									</a>
+								)
+							}
+							<a
+								href={instagramLink(contacts.instagram)}
+								target='_blank'
+								rel='noopener noreferrer'
+								aria-label='Instagram'
+								class='flex size-11 items-center justify-center border border-ink/20 hover:bg-ink hover:text-cream'
+							>
+								<InstagramIcon size={19} />
+							</a>
+							<a
+								href={contacts.twoGisUrl}
+								target='_blank'
+								rel='noopener noreferrer'
+								aria-label='2ГИС'
+								class='flex size-11 items-center justify-center border border-ink/20 hover:bg-ink hover:text-cream'
+							>
+								<TwoGisIcon size={19} />
+							</a>
+						</dd>
+					</div>
+				</dl>
+
+				<div class='flex flex-col gap-6 border-t border-ink/10 pt-10'>
+					<div>
+						<h3 class='text-h3 font-extrabold uppercase'>Остались вопросы?</h3>
+						<p class='mt-2 text-body-lg text-stone'>Оставьте номер — перезвоним в рабочее время.</p>
+					</div>
+					<BookingForm client:visible variant='callback' />
+				</div>
+			</div>
+
+			<div class='relative min-h-[420px] bg-sand-soft lg:min-h-full'>
+				<iframe
+					src={mapUrl}
+					title='NS Barber Studio на карте 2ГИС'
+					loading='lazy'
+					class='absolute inset-0 size-full border-0'
+					referrerpolicy='no-referrer-when-downgrade'></iframe>
+				<a
+					href={routeUrl}
+					target='_blank'
+					rel='noopener noreferrer'
+					class={buttonClass('primary', 'md', 'absolute bottom-4 left-4')}
+				>
+					<TwoGisIcon size={16} /> Построить маршрут
+				</a>
+			</div>
+		</div>
+	</div>
+</section>

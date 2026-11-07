@@ -1,0 +1,17 @@
+---
+import AdminLayout from '@/app/layouts/AdminLayout.astro';
+import { listBookings } from '@/entities/booking/api/booking.repo';
+import { getContent } from '@/entities/content/api/content.repo';
+import { isAuthed } from '@/shared/server/auth';
+import AdminPanel from '@/widgets/admin-panel/ui/AdminPanel';
+
+export const prerender = false;
+
+if (!isAuthed(Astro.cookies)) return Astro.redirect('/admin/login');
+
+const [content, bookings] = await Promise.all([getContent(), listBookings()]);
+---
+
+<AdminLayout title='Админка'>
+	<AdminPanel client:load initialContent={content} initialBookings={bookings} />
+</AdminLayout>

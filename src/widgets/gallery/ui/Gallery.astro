@@ -1,0 +1,38 @@
+---
+import type { SiteContent } from '@/entities/content';
+import { instagramLink } from '@/shared/lib/links';
+import { buttonClass } from '@/shared/ui/button-styles';
+import { InstagramIcon } from '@/shared/ui/icons';
+import SectionHeading from '@/shared/ui/section-heading.astro';
+import GalleryGrid from './GalleryGrid';
+
+interface Props {
+	content: SiteContent;
+}
+
+const { gallery, contacts } = Astro.props.content;
+---
+
+<section id='gallery' aria-labelledby='gallery-title' class='py-20 lg:py-32'>
+	<div class='section-container'>
+		<div class='flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between'>
+			<SectionHeading
+				id='gallery-title'
+				eyebrow='Портфолио'
+				title='Наши работы'
+				description='Стрижки, борода и атмосфера студии. Больше свежих работ — в нашем Instagram.'
+			/>
+			<a
+				href={instagramLink(contacts.instagram)}
+				target='_blank'
+				rel='noopener noreferrer'
+				class={buttonClass('outline', 'md', 'self-start lg:self-end')}
+			>
+				<InstagramIcon size={16} /> @{contacts.instagram}
+			</a>
+		</div>
+		<div class='mt-12'>
+			<GalleryGrid client:visible items={gallery} />
+		</div>
+	</div>
+</section>

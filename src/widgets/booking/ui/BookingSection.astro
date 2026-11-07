@@ -1,0 +1,62 @@
+---
+import type { SiteContent } from '@/entities/content';
+import BookingForm from '@/features/booking-form/ui/BookingForm';
+import { telLink } from '@/shared/lib/links';
+import { displayPhone } from '@/shared/lib/phone';
+import SectionHeading from '@/shared/ui/section-heading.astro';
+
+interface Props {
+	content: SiteContent;
+}
+
+const { categories, masters, contacts } = Astro.props.content;
+// В список мастеров формы попадают только заполненные имена (без заглушек)
+const masterNames = masters.map((m) => m.name).filter((n) => n && n !== 'Имя мастера');
+---
+
+<section id='booking' aria-labelledby='booking-title' class='bg-ink py-20 text-cream lg:py-32'>
+	<div class='section-container grid gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20'>
+		<div class='flex flex-col gap-10'>
+			<SectionHeading
+				id='booking-title'
+				eyebrow='Онлайн-запись'
+				title='Запишитесь за минуту'
+				description='Выберите услугу, дату и время — администратор перезвонит и подтвердит запись. Удобнее в мессенджере? Нажмите WhatsApp или Direct.'
+				inverted
+			/>
+			<dl class='grid grid-cols-2 gap-6 border-t border-cream/15 pt-8 text-body-md'>
+				<div class='flex flex-col gap-1'>
+					<dt class='text-cream/50'>Часы работы</dt>
+					<dd class='font-semibold'>
+						{contacts.hoursDays}<br />{contacts.openFrom}–{contacts.openTo}
+					</dd>
+				</div>
+				{
+					contacts.phone && (
+						<div class='flex flex-col gap-1'>
+							<dt class='text-cream/50'>Телефон</dt>
+							<dd>
+								<a href={telLink(contacts.phone)} class='font-semibold hover:underline'>
+									{displayPhone(contacts.phone)}
+								</a>
+							</dd>
+						</div>
+					)
+				}
+			</dl>
+		</div>
+		<div class='animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out-soft'>
+			<BookingForm
+				client:idle
+				variant='booking'
+				categories={categories}
+				masters={masterNames}
+				openFrom={contacts.openFrom}
+				openTo={contacts.openTo}
+				whatsapp={contacts.whatsapp}
+				instagram={contacts.instagram}
+				inverted
+			/>
+		</div>
+	</div>
+</section>

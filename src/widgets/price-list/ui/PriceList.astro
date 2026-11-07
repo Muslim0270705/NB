@@ -1,0 +1,80 @@
+---
+import type { SiteContent } from '@/entities/content';
+import { formatPrice } from '@/shared/lib/format';
+import { buttonClass } from '@/shared/ui/button-styles';
+import SectionHeading from '@/shared/ui/section-heading.astro';
+
+interface Props {
+	content: SiteContent;
+}
+
+const { categories } = Astro.props.content;
+---
+
+<section id='services' aria-labelledby='services-title' class='py-20 lg:py-32'>
+	<div class='section-container'>
+		<div class='flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between'>
+			<SectionHeading
+				id='services-title'
+				eyebrow='Прайс-лист'
+				title='Услуги и цены'
+				description='Цены указаны в сомах. Точное время и мастера подскажет администратор при подтверждении записи.'
+			/>
+		</div>
+
+		<div class='mt-14 grid gap-px bg-ink/10 md:grid-cols-2'>
+			{
+				categories.map((cat, i) => (
+					<article
+						class:list={[
+							'flex flex-col bg-cream p-6 sm:p-8 lg:p-12',
+							'animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out-soft',
+							i % 2 === 1 && 'delay-150',
+						]}
+					>
+						<header class='flex items-baseline justify-between gap-4'>
+							<h3 class='text-h3 font-extrabold uppercase'>{cat.title}</h3>
+							<span class='text-caption font-semibold text-stone'>
+								{String(i + 1).padStart(2, '0')}
+							</span>
+						</header>
+						{cat.description && <p class='mt-2 text-body-md text-stone'>{cat.description}</p>}
+
+						<ul class='mt-8 flex flex-1 flex-col gap-4'>
+							{cat.services.map((svc) => (
+								<li class='flex items-end text-body-lg'>
+									<span class='font-medium'>{svc.name}</span>
+									<span class='leader' aria-hidden='true' />
+									<span class='shrink-0 font-bold tabular-nums'>
+										{svc.note ? `${svc.note} ` : ''}
+										{formatPrice(svc.price)} <span class='text-body-md font-medium text-stone'>сом</span>
+									</span>
+								</li>
+							))}
+						</ul>
+
+						<a
+							href='#booking'
+							data-book-service={cat.services[0]?.id}
+							class={buttonClass('outline', 'md', 'mt-10 self-start')}
+						>
+							Записаться
+						</a>
+					</article>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<script>
+	// Кнопка «Записаться» у блока сразу выбирает услугу в форме записи
+	for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-book-service]')) {
+		link.addEventListener('click', () => {
+			const id = link.dataset.bookService;
+			if (!id) return;
+			window.nsSelectedService = id;
+			window.dispatchEvent(new CustomEvent('ns:select-service', { detail: id }));
+		});
+	}
+</script>

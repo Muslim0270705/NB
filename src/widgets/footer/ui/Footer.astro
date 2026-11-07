@@ -1,0 +1,87 @@
+---
+import type { SiteContent } from '@/entities/content';
+import { NAV, SITE } from '@/shared/config/site';
+import { instagramLink, telLink, whatsappLink } from '@/shared/lib/links';
+import { displayPhone } from '@/shared/lib/phone';
+import { InstagramIcon, TwoGisIcon, WhatsappIcon } from '@/shared/ui/icons';
+import { Logo } from '@/shared/ui/logo';
+
+interface Props {
+	content: SiteContent;
+}
+
+const { contacts } = Astro.props.content;
+const year = new Date().getFullYear();
+const socials = [
+	{ href: instagramLink(contacts.instagram), label: 'Instagram', Icon: InstagramIcon },
+	{ href: contacts.twoGisUrl, label: '2ГИС', Icon: TwoGisIcon },
+	...(contacts.whatsapp
+		? [{ href: whatsappLink(contacts.whatsapp), label: 'WhatsApp', Icon: WhatsappIcon }]
+		: []),
+];
+---
+
+<footer class='bg-ink text-cream'>
+	<div class='section-container grid gap-12 py-16 md:grid-cols-[1.3fr_1fr_1fr] lg:py-20'>
+		<div class='flex flex-col items-start gap-6'>
+			<Logo inverted className='h-24 lg:h-28' />
+			<p class='text-caption font-semibold uppercase tracking-[0.3em] text-cream/50'>
+				{SITE.slogan}
+			</p>
+		</div>
+
+		<nav aria-label='Навигация в подвале' class='flex flex-col gap-3'>
+			<span class='eyebrow mb-2 text-cream/40'>Разделы</span>
+			{
+				NAV.map((item) => (
+					<a href={item.href} class='text-body-lg text-cream/80 transition-colors hover:text-cream'>
+						{item.label}
+					</a>
+				))
+			}
+		</nav>
+
+		<div class='flex flex-col gap-3 text-body-lg text-cream/80'>
+			<span class='eyebrow mb-2 text-cream/40'>Контакты</span>
+			<address class='not-italic'>
+				Бишкек, {contacts.address}
+				{contacts.addressNote && <span class='block text-body-md text-cream/50'>{contacts.addressNote}</span>}
+			</address>
+			{
+				contacts.phone && (
+					<a href={telLink(contacts.phone)} class='font-semibold text-cream hover:underline'>
+						{displayPhone(contacts.phone)}
+					</a>
+				)
+			}
+			<span>
+				{contacts.hoursDays}, {contacts.openFrom}–{contacts.openTo}
+			</span>
+			<div class='mt-3 flex gap-2'>
+				{
+					socials.map(({ href, label, Icon }) => (
+						<a
+							href={href}
+							target='_blank'
+							rel='noopener noreferrer'
+							aria-label={label}
+							class='flex size-11 items-center justify-center border border-cream/20 transition-colors hover:bg-cream hover:text-ink'
+						>
+							<Icon size={19} />
+						</a>
+					))
+				}
+			</div>
+		</div>
+	</div>
+	<div class='border-t border-cream/10'>
+		<div
+			class='section-container flex flex-col gap-2 py-6 text-caption text-cream/40 sm:flex-row sm:justify-between'
+		>
+			<span>© {year} {SITE.name}. Все права защищены.</span>
+			<a href={`https://instagram.com/${contacts.instagram}`} class='hover:text-cream/70'>
+				@{contacts.instagram}
+			</a>
+		</div>
+	</div>
+</footer>

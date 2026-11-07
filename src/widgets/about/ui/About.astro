@@ -1,0 +1,130 @@
+---
+import type { SiteContent } from '@/entities/content';
+import SectionHeading from '@/shared/ui/section-heading.astro';
+
+interface Props {
+	content: SiteContent;
+}
+
+const { gallery, masters } = Astro.props.content;
+const interior = gallery.filter((g) => g.src && g.category === 'interior');
+const photo = interior[1] ?? interior[0];
+
+const values = [
+	{
+		title: 'Качество',
+		text: 'Профессиональная косметика, стерильный инструмент и внимание к каждой детали — от консультации до финальной укладки.',
+	},
+	{
+		title: 'Стиль',
+		text: 'Подбираем форму под тип лица и волос, образ жизни и ваш характер. Классика и современные техники.',
+	},
+	{
+		title: 'Профессионализм',
+		text: 'Мастера регулярно повышают квалификацию. К нам приходят надолго — и к своему мастеру.',
+	},
+];
+---
+
+<section id='about' aria-labelledby='about-title' class='bg-paper py-20 lg:py-32'>
+	<div class='section-container'>
+		<div class='grid gap-12 lg:grid-cols-[1fr_1fr] lg:gap-20'>
+			<div class='flex flex-col gap-10'>
+				<SectionHeading id='about-title' eyebrow='О студии' title='Место, куда хочется возвращаться' />
+				<div
+					class='flex flex-col gap-5 text-body-xl text-stone animate-on-scroll opacity-0 translate-y-6 transition-all duration-700 ease-out-soft'
+				>
+					<p>
+						NS Barber Studio — это барбершоп для тех, кто ценит точность и спокойный сервис. Без
+						спешки и лишнего шума: только мастер, хороший инструмент и результат, который держит
+						форму.
+					</p>
+					<p>
+						Мы стрижём взрослых и детей, оформляем бороду, делаем уход за кожей. Приходите
+						сами, с сыном или с друзьями — здесь всем найдётся удобное время.
+					</p>
+				</div>
+			</div>
+			<div
+				class='relative aspect-[4/5] w-full animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000 ease-out-soft lg:aspect-auto'
+			>
+				{
+					photo ? (
+						<img
+							src={photo.thumb ?? photo.src}
+							alt={photo.alt}
+							loading='lazy'
+							class='absolute inset-0 size-full object-cover'
+						/>
+					) : (
+						<div class='photo-placeholder absolute inset-0 flex items-end p-6'>
+							<span class='eyebrow'>Интерьер студии</span>
+						</div>
+					)
+				}
+			</div>
+		</div>
+
+		<ol class='mt-20 grid gap-px bg-ink/10 md:grid-cols-3'>
+			{
+				values.map((v, i) => (
+					<li
+						class:list={[
+							'flex flex-col gap-4 bg-paper py-8 md:px-8 md:first:pl-0',
+							'animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out-soft',
+							i === 1 && 'delay-150',
+							i === 2 && 'delay-300',
+						]}
+					>
+						<span class='text-caption font-semibold text-stone'>0{i + 1}</span>
+						<h3 class='text-h3 font-extrabold uppercase'>{v.title}</h3>
+						<p class='text-body-lg text-stone'>{v.text}</p>
+					</li>
+				))
+			}
+		</ol>
+
+		{
+			masters.length > 0 && (
+				<div class='mt-24'>
+					<div class='flex items-center gap-4'>
+						<span class='h-px w-10 bg-ink/40' />
+						<h3 class='eyebrow'>Наши мастера</h3>
+					</div>
+					<ul class='mt-10 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-8'>
+						{masters.map((m, i) => (
+							<li
+								class:list={[
+									'flex flex-col gap-4',
+									'animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out-soft',
+									i % 4 === 1 && 'delay-100',
+									i % 4 === 2 && 'delay-200',
+									i % 4 === 3 && 'delay-300',
+								]}
+							>
+								<div class='relative aspect-[3/4] overflow-hidden'>
+									{m.photo ? (
+										<img
+											src={m.photo}
+											alt={`${m.name} — ${m.role}`}
+											loading='lazy'
+											class='size-full object-cover grayscale transition-all duration-700 hover:grayscale-0'
+										/>
+									) : (
+										<div class='photo-placeholder flex size-full items-center justify-center'>
+											<span class='text-h1 font-black text-ink/15'>NS</span>
+										</div>
+									)}
+								</div>
+								<div>
+									<p class='text-body-xl font-bold uppercase tracking-[0.04em]'>{m.name}</p>
+									{m.role && <p class='text-body-md text-stone'>{m.role}</p>}
+								</div>
+							</li>
+						))}
+					</ul>
+				</div>
+			)
+		}
+	</div>
+</section>
