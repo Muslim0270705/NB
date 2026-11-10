@@ -1,14 +1,15 @@
 ---
-import { Clock, MapPin, Phone, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import type { SiteContent } from '@/entities/content';
 import { findService } from '@/entities/content';
 import { BOOKING_ANCHOR, SITE } from '@/shared/config/site';
 import { formatPrice } from '@/shared/lib/format';
-import { instagramLink, telLink } from '@/shared/lib/links';
+import { telLink } from '@/shared/lib/links';
 import { displayPhone } from '@/shared/lib/phone';
-import { buttonClass } from '@/shared/ui/button-styles';
-import { InstagramIcon, TwoGisIcon } from '@/shared/ui/icons';
+import { AnimatedText } from '@/shared/ui/animated-text';
+import CtaLink from '@/shared/ui/cta-link.astro';
 import { Logo } from '@/shared/ui/logo';
+import { RevealingCardContent } from '@/shared/ui/revealing-card-content';
 
 interface Props {
 	content: SiteContent;
@@ -17,161 +18,122 @@ interface Props {
 const { content } = Astro.props;
 const { contacts, rating } = content;
 
-// Обложка: первое загруженное фото интерьера (или любое), иначе — фирменная заглушка
+// Обложка: первое загруженное фото интерьера (или любое), иначе — тёмная фирменная заглушка
 const cover =
 	content.gallery.find((g) => g.src && g.category === 'interior') ??
 	content.gallery.find((g) => g.src);
 
-// Краткий блок услуг на первом экране
-const highlights = ['men-cut', 'beard-design', 'cut-beard', 'kids-cut']
-	.map((id) => findService(content, id))
-	.filter(Boolean)
-	.slice(0, 4);
-const shortList = highlights.length
-	? highlights
-	: content.categories.flatMap((c) => c.services).slice(0, 4);
+const mainService =
+	findService(content, 'men-cut') ?? content.categories.flatMap((c) => c.services)[0];
 ---
 
-<section aria-labelledby='hero-title' class='relative overflow-hidden pt-16 lg:pt-20'>
-	<div class='section-container grid gap-10 pb-12 pt-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:pb-16 lg:pt-14'>
-		<div class='flex flex-col justify-center'>
-			<p
-				class='eyebrow hero-in'
-			>
-				Барбершоп · {SITE.city}
-			</p>
+<!-- Первый экран как в Nomad College: фото во весь экран, крупное название, стеклянные карточки -->
+<section aria-labelledby='hero-title' class='relative min-h-[680px] overflow-hidden bg-ink lg:min-h-screen'>
+	{
+		cover ? (
+			<img
+				src={cover.src}
+				alt=''
+				aria-hidden='true'
+				width={cover.width}
+				height={cover.height}
+				fetchpriority='high'
+				class='absolute inset-0 size-full object-cover object-center'
+			/>
+		) : (
+			<div class='photo-placeholder-dark absolute inset-0 flex items-center justify-end overflow-hidden'>
+				<Logo variant='mark' inverted className='h-auto w-[70%] max-w-[760px] translate-x-[12%] opacity-[0.07]' title='' />
+			</div>
+		)
+	}
 
-			<h1
-				id='hero-title'
-				class='mt-6 hero-in [animation-delay:100ms]'
-			>
-				<Logo className='h-auto w-full max-w-[560px]' title='' />
-				<span class='sr-only'>NS Barber Studio</span>
+	<!-- Затемнение сверху (читаемость шапки) и слева (читаемость текста) -->
+	<div aria-hidden='true' class='absolute inset-0 bg-gradient-to-b from-black/40 from-[10%] to-transparent to-[70%]'></div>
+	<div aria-hidden='true' class='absolute inset-0 bg-gradient-to-r from-black/64 to-transparent'></div>
+
+	<div class='section-container relative flex min-h-[680px] flex-col lg:min-h-screen'>
+		<div class='flex flex-col gap-3 pt-[100px] lg:max-w-[760px] lg:gap-4 lg:pt-[188px]'>
+			<h1 id='hero-title' class='text-display font-bold text-white'>
+				<AnimatedText client:load text='NS Barber' />
+				<AnimatedText client:load text='Studio' initialDelay={0.4} isOdd className='-mt-3 py-3' />
 				<span class='sr-only'> — барбершоп в Бишкеке: мужские и детские стрижки, борода, уход</span>
 			</h1>
 
-			<p
-				class='mt-8 text-caption font-semibold uppercase tracking-[0.3em] text-stone hero-in [animation-delay:200ms]'
-			>
-				{SITE.slogan}
-			</p>
-			<p
-				class='mt-5 max-w-[480px] text-body-xl text-stone hero-in [animation-delay:300ms]'
-			>
-				Точные стрижки, аккуратная борода и спокойная атмосфера. Записывайтесь онлайн — это
-				займёт меньше минуты.
+			<p class='hero-in max-w-[343px] text-body-lg font-normal text-white/80 [animation-delay:700ms] lg:max-w-[520px] lg:text-h5'>
+				Барбершоп в Бишкеке: точные стрижки, аккуратная борода и спокойная атмосфера
 			</p>
 
-			<div
-				class='mt-9 flex flex-wrap gap-3 hero-in [animation-delay:300ms]'
-			>
-				<a href={BOOKING_ANCHOR} class={buttonClass('primary', 'lg')}>Записаться онлайн</a>
-				<a href='#services' class={buttonClass('outline', 'lg')}>Цены</a>
-			</div>
-
-			<div
-				class='mt-6 flex flex-wrap gap-2 hero-in [animation-delay:500ms]'
-			>
+			<div class='hero-in mt-4 flex flex-wrap items-center gap-3 [animation-delay:900ms] lg:mt-6'>
+				<CtaLink href={BOOKING_ANCHOR}>Записаться онлайн</CtaLink>
 				<a
-					href={instagramLink(contacts.instagram)}
-					target='_blank'
-					rel='noopener noreferrer'
-					class='inline-flex h-10 items-center gap-2 border border-ink/15 px-4 text-caption font-semibold uppercase tracking-[0.16em] transition-colors hover:border-ink'
+					href='#services'
+					class='inline-flex h-12 items-center px-6 text-body-md font-semibold text-white transition-colors glass-card hover:bg-white/[0.2] lg:h-14 lg:text-body-lg'
 				>
-					<InstagramIcon size={16} /> Instagram
-				</a>
-				<a
-					href={contacts.twoGisUrl}
-					target='_blank'
-					rel='noopener noreferrer'
-					class='inline-flex h-10 items-center gap-2 border border-ink/15 px-4 text-caption font-semibold uppercase tracking-[0.16em] transition-colors hover:border-ink'
-				>
-					<TwoGisIcon size={16} /> 2ГИС
+					Цены
 				</a>
 			</div>
 		</div>
 
-		<div
-			class='relative min-h-[420px] hero-in [animation-delay:200ms] lg:min-h-[620px]'
-		>
-			{
-				cover ? (
-					<img
-						src={cover.src}
-						alt={cover.alt}
-						width={cover.width}
-						height={cover.height}
-						fetchpriority='high'
-						class='absolute inset-0 size-full object-cover'
-					/>
-				) : (
-					<div class='photo-placeholder-dark absolute inset-0 flex items-center justify-center'>
-						<Logo variant='mark' inverted className='h-auto w-3/4 opacity-[0.12]' title='' />
-					</div>
-				)
-			}
+		<!-- Стеклянные карточки: на мобиле — в потоке, на десктопе — разбросаны по фото -->
+		<div class='mt-10 grid grid-cols-2 gap-3 pb-10 lg:contents'>
 			{
 				rating.count > 0 && (
 					<a
 						href={contacts.twoGisUrl}
 						target='_blank'
 						rel='noopener noreferrer'
-						class='absolute bottom-0 left-0 flex items-center gap-4 bg-cream px-5 py-4 lg:-left-8 lg:bottom-10'
+						class='glass-card block transition-colors hover:bg-white/[0.18] lg:absolute lg:right-[280px] lg:top-[220px] lg:w-[200px]'
 					>
-						<span class='text-h2 font-black leading-none'>{rating.value.toFixed(1)}</span>
-						<span class='flex flex-col gap-1'>
-							<span class='flex gap-0.5' aria-label={`Рейтинг ${rating.value} из 5`}>
-								{Array.from({ length: 5 }, () => (
-									<Star size={13} fill='currentColor' />
-								))}
-							</span>
-							<span class='text-caption font-medium text-stone'>{rating.count} оценок в 2ГИС</span>
-						</span>
+						<RevealingCardContent client:load delay={0.5}>
+							<div class='p-4 lg:p-5'>
+								<p class='mb-3 text-body-md font-medium text-white/60 lg:mb-6'>Рейтинг 2ГИС</p>
+								<p class='flex items-center gap-2 text-white'>
+									<span class='text-h3 font-bold'>{rating.value.toFixed(1)}</span>
+									<span class='flex gap-0.5' aria-label={`Рейтинг ${rating.value} из 5`}>
+										{Array.from({ length: 5 }, () => (
+											<Star size={13} fill='currentColor' />
+										))}
+									</span>
+								</p>
+							</div>
+						</RevealingCardContent>
 					</a>
 				)
 			}
-		</div>
-	</div>
 
-	<!-- Краткий прайс и контакты на первом экране -->
-	<div class='border-y border-ink/10 bg-paper/50'>
-		<div class='section-container grid lg:grid-cols-[1.4fr_1fr]'>
-			<ul class='grid grid-cols-2 border-ink/10 md:grid-cols-4 lg:border-r'>
-				{
-					shortList.map((svc, i) => (
-						<li
-							class:list={[
-								'flex flex-col gap-2 py-6 pr-4',
-								i % 2 === 1 && 'pl-4 border-l border-ink/10 md:pl-6',
-								i > 1 && 'border-t border-ink/10 md:border-t-0',
-								i === 2 && 'md:border-l md:pl-6',
-							]}
-						>
-							<span class='text-body-md text-stone'>{svc?.name}</span>
-							<span class='text-h3 font-extrabold'>
-								{formatPrice(svc?.price ?? 0)} <span class='text-body-md font-semibold'>сом</span>
-							</span>
-						</li>
-					))
-				}
-			</ul>
-			<div class='flex flex-col justify-center gap-3 border-t border-ink/10 py-6 text-body-md lg:border-t-0 lg:pl-10'>
-				<span class='flex items-center gap-3'>
-					<MapPin size={16} className='shrink-0' />
-					{contacts.address}, {SITE.city}
-				</span>
-				<span class='flex items-center gap-3'>
-					<Clock size={16} className='shrink-0' />
-					{contacts.hoursDays}, {contacts.openFrom}–{contacts.openTo}
-				</span>
-				{
-					contacts.phone && (
-						<a href={telLink(contacts.phone)} class='flex items-center gap-3 font-semibold'>
-							<Phone size={16} className='shrink-0' />
-							{displayPhone(contacts.phone)}
-						</a>
-					)
-				}
+			{
+				mainService && (
+					<div class='glass-card lg:absolute lg:bottom-[100px] lg:right-[120px] lg:w-[340px]'>
+						<RevealingCardContent client:load delay={1.1}>
+							<div class='p-4 lg:p-5'>
+								<p class='mb-3 text-body-md font-medium text-white/60 lg:mb-6'>{mainService.name}</p>
+								<p class='text-body-md font-medium text-white lg:text-body-xl'>
+									от {formatPrice(mainService.price)} сом · профессиональная косметика и стерильный инструмент
+								</p>
+							</div>
+						</RevealingCardContent>
+					</div>
+				)
+			}
+
+			<div class='glass-card col-span-2 lg:absolute lg:bottom-[160px] lg:left-auto lg:right-[500px] lg:w-[300px]'>
+				<RevealingCardContent client:load delay={0.8}>
+					<div class='p-4 lg:p-5'>
+						<p class='mb-3 text-body-md font-medium text-white/60 lg:mb-6'>
+							{contacts.hoursDays}, {contacts.openFrom}–{contacts.openTo}
+						</p>
+						<p class='text-body-md font-medium text-white lg:text-body-xl'>
+							{SITE.city}, {contacts.address}
+						</p>
+						{
+							contacts.phone && (
+								<a href={telLink(contacts.phone)} class='mt-2 block text-body-md font-semibold text-white hover:underline lg:text-body-lg'>
+									{displayPhone(contacts.phone)}
+								</a>
+							)
+						}
+					</div>
+				</RevealingCardContent>
 			</div>
 		</div>
 	</div>

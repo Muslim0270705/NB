@@ -14,7 +14,7 @@ const { categories, masters, contacts } = Astro.props.content;
 const masterNames = masters.map((m) => m.name).filter((n) => n && n !== 'Имя мастера');
 ---
 
-<section id='booking' aria-labelledby='booking-title' class='bg-ink py-20 text-cream lg:py-32'>
+<section id='booking' aria-labelledby='booking-title' class='bg-ink py-16 text-cream lg:py-[100px]'>
 	<div class='section-container grid gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20'>
 		<div class='flex flex-col gap-10'>
 			<SectionHeading
@@ -45,7 +45,7 @@ const masterNames = masters.map((m) => m.name).filter((n) => n && n !== 'Имя 
 				}
 			</dl>
 		</div>
-		<div class='animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out-soft'>
+		<div class='animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out'>
 			<BookingForm
 				client:idle
 				variant='booking'

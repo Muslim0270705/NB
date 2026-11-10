@@ -14,15 +14,15 @@ const { reviews, rating, contacts } = Astro.props.content;
 const reviewsUrl = twoGisReviewsLink(contacts.twoGisUrl);
 ---
 
-<section id='reviews' aria-labelledby='reviews-title' class='bg-sand py-20 lg:py-32'>
+<section id='reviews' aria-labelledby='reviews-title' class='bg-sand py-16 lg:py-[100px]'>
 	<div class='section-container'>
 		<div class='grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20'>
 			<div class='flex flex-col gap-10'>
 				<SectionHeading id='reviews-title' eyebrow='Отзывы' title='Нам доверяют' />
 				{
 					rating.count > 0 && (
-						<div class='flex items-center gap-6 animate-on-scroll opacity-0 translate-y-6 transition-all duration-700 ease-out-soft'>
-							<span class='text-[clamp(4.5rem,9vw,7rem)] font-black leading-none tracking-[-0.04em]'>
+						<div class='flex items-center gap-6 animate-on-scroll opacity-0 translate-y-6 transition-all duration-700 ease-out'>
+							<span class='text-[clamp(4.5rem,9vw,7rem)] font-bold leading-none'>
 								{rating.value.toFixed(1)}
 							</span>
 							<div class='flex flex-col gap-2'>
@@ -50,12 +50,12 @@ const reviewsUrl = twoGisReviewsLink(contacts.twoGisUrl);
 
 			{
 				reviews.length > 0 ? (
-					<ul class='grid gap-px bg-ink/10 sm:grid-cols-2'>
+					<ul class='grid gap-4 sm:grid-cols-2 lg:gap-6'>
 						{reviews.slice(0, 6).map((r, i) => (
 							<li
 								class:list={[
-									'flex flex-col gap-5 bg-sand p-6 sm:p-8',
-									'animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out-soft',
+									'flex flex-col gap-5 border-t-2 border-ink bg-cream p-6 sm:p-8',
+									'animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out',
 									i % 2 === 1 && 'delay-150',
 								]}
 							>
@@ -65,13 +65,13 @@ const reviewsUrl = twoGisReviewsLink(contacts.twoGisUrl);
 									))}
 								</span>
 								<blockquote class='flex-1 text-body-lg text-ink/85'>«{r.text}»</blockquote>
-								<p class='text-caption font-bold uppercase tracking-[0.2em]'>{r.author}</p>
+								<p class='text-body-md font-semibold'>{r.author}</p>
 							</li>
 						))}
 					</ul>
 				) : (
-					<div class='flex flex-col justify-center gap-4 border border-ink/15 p-8 lg:p-12 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out-soft'>
-						<p class='text-h3 font-extrabold uppercase'>Были у нас?</p>
+					<div class='flex flex-col justify-center gap-4 border border-ink/15 p-8 lg:p-12 animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out'>
+						<p class='text-h3 font-bold'>Были у нас?</p>
 						<p class='text-body-lg text-ink/70'>
 							Расскажите о визите в 2ГИС — это помогает нам становиться лучше, а другим гостям
 							выбрать своего мастера.

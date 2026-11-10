@@ -1,7 +1,9 @@
 ---
+import { Logo } from '@/shared/ui/logo';
+
 interface Props {
 	eyebrow: string;
-	title: string;
+	title?: string;
 	description?: string;
 	align?: 'left' | 'center';
 	inverted?: boolean;
@@ -21,33 +23,45 @@ const {
 const center = align === 'center';
 ---
 
+<!-- Заголовок секции как в Nomad College: линия, знак, подпись, крупный заголовок -->
 <div
 	class:list={[
-		'animate-on-scroll opacity-0 translate-y-6 transition-all duration-700 ease-out-soft',
-		'flex flex-col gap-5',
+		'animate-on-scroll opacity-0 translate-y-6 transition-all duration-700 ease-out',
+		'flex flex-col gap-6',
 		center && 'items-center text-center',
 		className,
 	]}
 >
-	<div class:list={['flex items-center gap-4', center && 'justify-center']}>
-		<span class:list={['h-px w-10', inverted ? 'bg-cream/50' : 'bg-ink/40']}></span>
-		<span class:list={['eyebrow', inverted && 'text-cream/60']}>{eyebrow}</span>
+	<div class='flex w-full flex-col gap-4'>
+		<div
+			class:list={[
+				'h-px w-full max-w-[416px]',
+				center && 'mx-auto',
+				inverted ? 'bg-cream/40' : 'bg-ink',
+			]}
+		>
+		</div>
+		<div class:list={['flex items-center gap-[11px]', center && 'justify-center']}>
+			<Logo variant='mark' inverted={inverted} className='h-5 w-auto shrink-0' title='' />
+			<span class:list={['eyebrow', inverted && 'text-cream/60']}>{eyebrow}</span>
+		</div>
 	</div>
-	<h2
-		id={id}
-		class:list={[
-			'text-h2 font-extrabold uppercase tracking-[-0.01em]',
-			inverted ? 'text-cream' : 'text-ink',
-		]}
-	>
-		{title}
-	</h2>
+	{
+		title && (
+			<h2
+				id={id}
+				class:list={['text-h2 font-bold', inverted ? 'text-cream' : 'text-ink']}
+			>
+				{title}
+			</h2>
+		)
+	}
 	{
 		description && (
 			<p
 				class:list={[
-					'max-w-[560px] text-body-lg',
-					inverted ? 'text-cream/70' : 'text-stone',
+					'max-w-[811px] text-h5 font-normal',
+					inverted ? 'text-cream/80' : 'text-ink/80',
 				]}
 			>
 				{description}

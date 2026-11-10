@@ -17,7 +17,7 @@ const mapUrl = twoGisWidgetUrl(contacts.twoGisUrl, contacts.lat, contacts.lon);
 const routeUrl = `https://2gis.kg/bishkek/directions/points/%7C${contacts.lon}%2C${contacts.lat}`;
 ---
 
-<section id='contacts' aria-labelledby='contacts-title' class='py-20 lg:py-32'>
+<section id='contacts' aria-labelledby='contacts-title' class='py-16 lg:py-[100px]'>
 	<div class='section-container'>
 		<SectionHeading id='contacts-title' eyebrow='Контакты' title='Как нас найти' />
 
@@ -90,7 +90,7 @@ const routeUrl = `https://2gis.kg/bishkek/directions/points/%7C${contacts.lon}%2
 
 				<div class='flex flex-col gap-6 border-t border-ink/10 pt-10'>
 					<div>
-						<h3 class='text-h3 font-extrabold uppercase'>Остались вопросы?</h3>
+						<h3 class='text-h3 font-bold'>Остались вопросы?</h3>
 						<p class='mt-2 text-body-lg text-stone'>Оставьте номер — перезвоним в рабочее время.</p>
 					</div>
 					<BookingForm client:visible variant='callback' />

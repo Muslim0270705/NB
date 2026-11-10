@@ -11,7 +11,7 @@ interface Props {
 const { categories } = Astro.props.content;
 ---
 
-<section id='services' aria-labelledby='services-title' class='py-20 lg:py-32'>
+<section id='services' aria-labelledby='services-title' class='py-16 lg:py-[100px]'>
 	<div class='section-container'>
 		<div class='flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between'>
 			<SectionHeading
@@ -22,19 +22,19 @@ const { categories } = Astro.props.content;
 			/>
 		</div>
 
-		<div class='mt-14 grid gap-px bg-ink/10 md:grid-cols-2'>
+		<div class='mt-12 grid gap-4 md:grid-cols-2 lg:mt-20 lg:gap-6'>
 			{
 				categories.map((cat, i) => (
 					<article
 						class:list={[
-							'flex flex-col bg-cream p-6 sm:p-8 lg:p-12',
-							'animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out-soft',
+							'flex flex-col border-t-2 border-ink bg-paper p-6 sm:p-8 lg:p-10',
+							'animate-on-scroll opacity-0 translate-y-8 transition-all duration-700 ease-out',
 							i % 2 === 1 && 'delay-150',
 						]}
 					>
 						<header class='flex items-baseline justify-between gap-4'>
-							<h3 class='text-h3 font-extrabold uppercase'>{cat.title}</h3>
-							<span class='text-caption font-semibold text-stone'>
+							<h3 class='text-h3 font-bold'>{cat.title}</h3>
+							<span class='text-body-md font-medium text-stone'>
 								{String(i + 1).padStart(2, '0')}
 							</span>
 						</header>
@@ -56,7 +56,7 @@ const { categories } = Astro.props.content;
 						<a
 							href='#booking'
 							data-book-service={cat.services[0]?.id}
-							class={buttonClass('outline', 'md', 'mt-10 self-start')}
+							class={buttonClass('primary', 'md', 'mt-10 self-start')}
 						>
 							Записаться
 						</a>

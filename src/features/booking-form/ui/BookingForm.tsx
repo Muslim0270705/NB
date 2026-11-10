@@ -234,9 +234,7 @@ export default function BookingForm({
 				>
 					<Check size={22} />
 				</span>
-				<h3 className="text-h3 font-extrabold uppercase">
-					{isBooking ? 'Заявка принята' : 'Спасибо!'}
-				</h3>
+				<h3 className="text-h3 font-bold">{isBooking ? 'Заявка принята' : 'Спасибо!'}</h3>
 				<p className={cn('text-body-lg', inverted ? 'text-cream/70' : 'text-stone')}>
 					{isBooking && selected && values.time
 						? `${selected.name} · ${formatDateRu(values.date)}, ${values.time}. `
@@ -252,7 +250,7 @@ export default function BookingForm({
 						setStatus('idle');
 					}}
 					className={cn(
-						'text-caption font-semibold uppercase tracking-[0.2em] underline underline-offset-8',
+						'text-body-md font-semibold underline underline-offset-8',
 						inverted ? 'text-cream' : 'text-ink'
 					)}
 				>
@@ -263,7 +261,7 @@ export default function BookingForm({
 	}
 
 	const label = (text: string, required = false) => (
-		<span className={cn('text-caption font-semibold uppercase tracking-[0.18em]', tone.label)}>
+		<span className={cn('text-body-md font-semibold', tone.label)}>
 			{text}
 			{required && ' *'}
 		</span>

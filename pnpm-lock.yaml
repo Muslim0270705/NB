@@ -20,6 +20,9 @@ importers:
       '@fontsource-variable/montserrat':
         specifier: ^5.2.8
         version: 5.3.0
+      '@fontsource/wix-madefor-display':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@netlify/blobs':
         specifier: ^11.1.8
         version: 11.1.8(supports-color@7.2.0)
@@ -684,6 +687,9 @@ packages:
 
   '@fontsource-variable/montserrat@5.3.0':
     resolution: {integrity: sha512-7PaZoxaxrWLAyrhO46v65An9LhUhfkTExWLhfbywYZCnZEgg/W1rEHnlNmZKjNZ3nJTVYyicqxlJt10z/26yTA==}
+
+  '@fontsource/wix-madefor-display@5.3.0':
+    resolution: {integrity: sha512-APPTGYDILe1swgUKE2gfo4PmkPxJiWv2eC3uoT6Tmg0BleklXw5wFAUdgVTD0VQloJvUNx1g0nfdUWGH1ZUvEw==}
 
   '@humanwhocodes/momoa@2.0.4':
     resolution: {integrity: sha512-RE815I4arJFtt+FVeU1Tgp9/Xvecacji8w/V6XtXsWWH/wz/eNkNbhb+ny/+PlVZjV0rxQpRSQKNKE3lcktHEA==}
@@ -5182,6 +5188,8 @@ snapshots:
   '@fastify/busboy@3.2.5': {}
 
   '@fontsource-variable/montserrat@5.3.0': {}
+
+  '@fontsource/wix-madefor-display@5.3.0': {}
 
   '@humanwhocodes/momoa@2.0.4': {}
 

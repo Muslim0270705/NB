@@ -34,6 +34,9 @@ export default function Header({ phone, phoneLabel, instagram, twoGisUrl, whatsa
 		return () => window.removeEventListener('keydown', onKey);
 	}, [open]);
 
+	// Как в Nomad College: светлая плашка над первым экраном, тёмная при прокрутке
+	const dark = scrolled || open;
+
 	const socials = [
 		{ href: instagramLink(instagram), label: 'Instagram', icon: InstagramIcon },
 		{ href: twoGisUrl, label: '2ГИС', icon: TwoGisIcon },
@@ -43,15 +46,13 @@ export default function Header({ phone, phoneLabel, instagram, twoGisUrl, whatsa
 	return (
 		<header
 			className={cn(
-				'fixed inset-x-0 top-0 z-50 transition-all duration-500',
-				scrolled || open
-					? 'bg-cream/95 shadow-[0_1px_0_rgb(26_26_26/0.08)] backdrop-blur'
-					: 'bg-transparent'
+				'fixed left-1/2 top-0 z-50 w-full max-w-[1296px] -translate-x-1/2 transition-[background-color,color,top] duration-300',
+				dark ? 'bg-ink text-cream lg:top-0' : 'bg-cream text-ink lg:top-8'
 			)}
 		>
-			<div className="section-container flex h-16 items-center justify-between gap-6 lg:h-20">
+			<div className="flex h-16 items-center justify-between gap-6 px-4 lg:h-[68px] lg:px-6">
 				<a href="/" aria-label="NS Barber Studio — на главную" className="shrink-0">
-					<Logo className="h-10 lg:h-12" title="" />
+					<Logo inverted={dark} className="h-10 lg:h-11" title="" />
 				</a>
 
 				<nav aria-label="Основная навигация" className="hidden xl:block">
@@ -60,7 +61,7 @@ export default function Header({ phone, phoneLabel, instagram, twoGisUrl, whatsa
 							<li key={item.href}>
 								<a
 									href={item.href}
-									className="whitespace-nowrap text-caption font-semibold uppercase tracking-[0.16em] text-ink/80 transition-colors hover:text-ink"
+									className="whitespace-nowrap text-body-md font-medium opacity-80 transition-opacity hover:opacity-100"
 								>
 									{item.label}
 								</a>
@@ -78,7 +79,7 @@ export default function Header({ phone, phoneLabel, instagram, twoGisUrl, whatsa
 								target="_blank"
 								rel="noopener noreferrer"
 								aria-label={label}
-								className="flex size-10 items-center justify-center text-ink transition-colors hover:text-stone"
+								className="flex size-10 items-center justify-center opacity-80 transition-opacity hover:opacity-100"
 							>
 								<Icon size={19} />
 							</a>
@@ -87,7 +88,7 @@ export default function Header({ phone, phoneLabel, instagram, twoGisUrl, whatsa
 					{phone && (
 						<a
 							href={telLink(phone)}
-							className="hidden items-center gap-2 whitespace-nowrap text-body-md font-semibold text-ink md:flex"
+							className="hidden items-center gap-2 whitespace-nowrap text-body-md font-semibold md:flex"
 						>
 							<Phone size={16} />
 							{phoneLabel}
@@ -95,7 +96,7 @@ export default function Header({ phone, phoneLabel, instagram, twoGisUrl, whatsa
 					)}
 					<a
 						href={BOOKING_ANCHOR}
-						className={buttonClass('primary', 'sm', 'hidden sm:inline-flex')}
+						className={buttonClass(dark ? 'light' : 'primary', 'sm', 'hidden sm:inline-flex')}
 					>
 						Записаться
 					</a>
@@ -105,7 +106,7 @@ export default function Header({ phone, phoneLabel, instagram, twoGisUrl, whatsa
 						aria-expanded={open}
 						aria-controls="mobile-menu"
 						aria-label={open ? 'Закрыть меню' : 'Открыть меню'}
-						className="flex size-11 items-center justify-center text-ink xl:hidden"
+						className="flex size-11 items-center justify-center xl:hidden"
 					>
 						{open ? <X size={24} /> : <Menu size={24} />}
 					</button>
@@ -115,15 +116,15 @@ export default function Header({ phone, phoneLabel, instagram, twoGisUrl, whatsa
 			<div
 				id="mobile-menu"
 				hidden={!open}
-				className="h-[calc(100dvh-4rem)] overflow-y-auto border-t border-ink/10 bg-cream xl:hidden"
+				className="h-[calc(100dvh-4rem)] overflow-y-auto border-t border-cream/10 bg-ink text-cream xl:hidden"
 			>
-				<nav aria-label="Мобильная навигация" className="section-container flex flex-col py-6">
+				<nav aria-label="Мобильная навигация" className="flex flex-col px-4 py-6">
 					{NAV.map((item) => (
 						<a
 							key={item.href}
 							href={item.href}
 							onClick={() => setOpen(false)}
-							className="border-b border-ink/10 py-5 text-h3 font-extrabold uppercase text-ink"
+							className="border-b border-cream/10 py-5 text-h3 font-semibold"
 						>
 							{item.label}
 						</a>
@@ -131,12 +132,12 @@ export default function Header({ phone, phoneLabel, instagram, twoGisUrl, whatsa
 					<a
 						href={BOOKING_ANCHOR}
 						onClick={() => setOpen(false)}
-						className={buttonClass('primary', 'lg', 'mt-8 w-full')}
+						className={buttonClass('light', 'lg', 'mt-8 w-full')}
 					>
 						Записаться онлайн
 					</a>
 					{phone && (
-						<a href={telLink(phone)} className="mt-6 text-h3 font-bold text-ink">
+						<a href={telLink(phone)} className="mt-6 text-h3 font-bold">
 							{phoneLabel}
 						</a>
 					)}
@@ -147,7 +148,7 @@ export default function Header({ phone, phoneLabel, instagram, twoGisUrl, whatsa
 								href={href}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="flex h-12 items-center gap-2 border border-ink/20 px-4 text-caption font-semibold uppercase tracking-[0.16em]"
+								className="flex h-12 items-center gap-2 border border-cream/20 px-4 text-body-md font-semibold"
 							>
 								<Icon size={18} />
 								{label}

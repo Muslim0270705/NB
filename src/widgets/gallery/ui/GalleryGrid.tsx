@@ -68,7 +68,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 							aria-selected={filter === f}
 							onClick={() => setFilter(f)}
 							className={cn(
-								'h-10 border px-5 text-caption font-semibold uppercase tracking-[0.18em] transition-colors',
+								'h-10 border px-5 text-body-md font-semibold transition-colors',
 								filter === f
 									? 'border-ink bg-ink text-cream'
 									: 'border-ink/20 text-ink hover:border-ink'
@@ -113,9 +113,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 								</button>
 							) : (
 								<div className="photo-placeholder absolute inset-0 flex items-end p-4">
-									<span className="text-caption font-semibold uppercase tracking-[0.2em] text-ink/50">
-										{item.alt}
-									</span>
+									<span className="text-body-md font-semibold text-ink/50">{item.alt}</span>
 								</div>
 							)}
 						</motion.li>
@@ -145,7 +143,7 @@ export default function GalleryGrid({ items }: GalleryGridProps) {
 							className="max-h-[86vh] max-w-full object-contain"
 							onClick={(e) => e.stopPropagation()}
 						/>
-						<p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-caption uppercase tracking-[0.2em] text-cream/60">
+						<p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-body-md text-cream/60">
 							{current.alt} · {(active ?? 0) + 1} / {photos.length}
 						</p>
 						<button

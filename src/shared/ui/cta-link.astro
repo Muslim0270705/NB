@@ -1,0 +1,37 @@
+---
+import { ctaClass } from '@/shared/ui/button-styles';
+
+interface Props {
+	href: string;
+	class?: string;
+	external?: boolean;
+	[key: string]: unknown;
+}
+
+const { href, class: className = '', external = false, ...rest } = Astro.props;
+---
+
+<a
+	href={href}
+	class:list={[ctaClass.root, className]}
+	{...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+	{...rest}
+>
+	<span class={ctaClass.label}><slot /></span>
+	<span class={ctaClass.arrow}>
+		<svg
+			class='transition-transform duration-200 group-hover:translate-x-1'
+			width='18'
+			height='18'
+			viewBox='0 0 24 24'
+			fill='none'
+			stroke='currentColor'
+			stroke-width='2'
+			stroke-linecap='round'
+			stroke-linejoin='round'
+			aria-hidden='true'
+		>
+			<path d='M5 12h14M12 5l7 7-7 7'></path>
+		</svg>
+	</span>
+</a>
