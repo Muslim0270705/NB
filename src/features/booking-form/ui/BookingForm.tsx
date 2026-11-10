@@ -74,8 +74,35 @@ export default function BookingForm({
 	const services = useMemo(() => categories.flatMap((c) => c.services), [categories]);
 	const selected = services.find((s) => s.id === values.serviceId);
 
-	// Свободные слоты: для сегодняшнего дня скрываем прошедшее время
+	// Свободное время из CRM (учитывает занятых мастеров). null — CRM не подключена
+	const [remoteSlots, setRemoteSlots] = useState<string[] | null>(null);
+	const [slotsLoading, setSlotsLoading] = useState(false);
+	const [busyError, setBusyError] = useState(false);
+
+	useEffect(() => {
+		if (!isBooking || !values.serviceId || !values.date) {
+			setRemoteSlots(null);
+			return;
+		}
+		const controller = new AbortController();
+		const query = new URLSearchParams({ date: values.date, service: values.serviceId });
+		if (values.master) query.set('master', values.master);
+		setSlotsLoading(true);
+		fetch(`/api/slots?${query}`, { signal: controller.signal })
+			.then((r) => r.json())
+			.then((data: { times: string[] | null }) => setRemoteSlots(data.times))
+			.catch(() => {
+				if (!controller.signal.aborted) setRemoteSlots(null);
+			})
+			.finally(() => {
+				if (!controller.signal.aborted) setSlotsLoading(false);
+			});
+		return () => controller.abort();
+	}, [isBooking, values.serviceId, values.date, values.master]);
+
+	// Без CRM — время по часам работы; для сегодняшнего дня скрываем прошедшее
 	const slots = useMemo(() => {
+		if (remoteSlots) return remoteSlots;
 		const all = timeSlots(openFrom, openTo);
 		if (values.date !== bishkekDate()) return all;
 		const now = bishkekMinutesNow() + 30;
@@ -83,7 +110,7 @@ export default function BookingForm({
 			const [h, m] = t.split(':').map(Number);
 			return h * 60 + m >= now;
 		});
-	}, [openFrom, openTo, values.date]);
+	}, [remoteSlots, openFrom, openTo, values.date]);
 
 	// Кнопка «Записаться» у блока прайса передаёт выбранную услугу
 	useEffect(() => {
@@ -145,7 +172,16 @@ export default function BookingForm({
 					elapsed: Date.now() - startedAt.current,
 				}),
 			});
+			if (response.status === 409) {
+				// Пока клиент заполнял форму, время заняли — обновляем список
+				setBusyError(true);
+				setValues((prev) => ({ ...prev, time: '' }));
+				setRemoteSlots((prev) => prev?.filter((t) => t !== values.time) ?? prev);
+				setStatus('idle');
+				return;
+			}
 			if (!response.ok) throw new Error(String(response.status));
+			setBusyError(false);
 			setStatus('sent');
 			window.dispatchEvent(new CustomEvent('ns:lead', { detail: variant }));
 		} catch {
@@ -342,7 +378,9 @@ export default function BookingForm({
 									aria-label="Время"
 									className={cn(fieldClass, 'appearance-none')}
 								>
-									<option value="">Выберите время</option>
+									<option value="">
+										{slotsLoading ? 'Проверяем свободное время…' : 'Выберите время'}
+									</option>
 									{slots.map((t) => (
 										<option key={t} value={t}>
 											{t}
@@ -351,10 +389,17 @@ export default function BookingForm({
 								</select>
 							) : (
 								<p className={cn('flex h-14 items-center text-body-md', tone.label)}>
-									На сегодня запись закрыта — выберите другой день
+									{slotsLoading
+										? 'Проверяем свободное время…'
+										: 'На этот день свободного времени нет — выберите другой'}
 								</p>
 							)}
 							{errorText('time')}
+							{busyError && (
+								<span className={cn('text-body-md', tone.error)}>
+									Это время только что заняли — выберите другое
+								</span>
+							)}
 						</div>
 					</div>
 				</>

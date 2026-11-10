@@ -3,6 +3,7 @@ import { addBooking } from '@/entities/booking/api/booking.repo';
 import { formatDateRu } from '@/entities/booking/model/slots';
 import { getContent } from '@/entities/content/api/content.repo';
 import { findService } from '@/entities/content/model/selectors';
+import { CrmError, crmCreateBooking, isCrmEnabled } from '@/shared/server/crm';
 import { json, num, rateLimited, str } from '@/shared/server/http';
 import { escapeHtml, notifyTelegram } from '@/shared/server/notify';
 
@@ -41,6 +42,29 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 	if (type === 'booking') {
 		if (!service || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) {
 			return json({ ok: false, error: 'validation' }, 422);
+		}
+	}
+
+	// CRM подключена — запись создаётся там: CRM проверит занятость мастера,
+	// подтвердит клиенту и уведомит владельца в WhatsApp
+	if (type === 'booking' && service && isCrmEnabled()) {
+		try {
+			await crmCreateBooking({
+				name,
+				phone,
+				serviceName: service.name,
+				masterName: str(input.master, 80) || undefined,
+				date,
+				time,
+				comment: str(input.comment, 1000) || undefined,
+			});
+			return json({ ok: true });
+		} catch (error) {
+			if (error instanceof CrmError && error.status === 409) {
+				return json({ ok: false, error: 'busy' }, 409);
+			}
+			// CRM недоступна — сохраняем заявку на сайте, чтобы не потерять клиента
+			console.error('CRM booking failed, saving locally', error);
 		}
 	}
 

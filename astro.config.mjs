@@ -29,6 +29,9 @@ export default defineConfig({
 			TELEGRAM_CHAT_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
 			// Где хранятся контент, заявки и загруженные фото (в Docker — volume)
 			DATA_DIR: envField.string({ context: 'server', access: 'public', optional: true }),
+			// CRM NS Barber (crm_nb): заявки уходят туда, свободное время берётся оттуда
+			CRM_API_URL: envField.string({ context: 'server', access: 'public', optional: true }),
+			CRM_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
 			// Аналитика: подключается, только если ID заданы
 			PUBLIC_GA_ID: envField.string({ context: 'client', access: 'public', optional: true }),
 			PUBLIC_YM_ID: envField.string({ context: 'client', access: 'public', optional: true }),
